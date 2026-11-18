@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quiz compagnon - Trouvez ses essentiels</title>
+  <style>
+    :root {
+      --cream: #fff9ef;
+      --ink: #21352e;
+      --green: #214e3c;
+      --mint: #dceadd;
+      --peach: #f2bd9c;
+      --yellow: #f6dc89;
+      --white: #fff;
+      --line: #d7e1d5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(246,220,137,.48), transparent 25rem),
+        linear-gradient(135deg, var(--cream), #f4f8ef);
+    }
+    button, input { font: inherit; }
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 42% 58%;
+    }
+    .aside {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 48px;
+      background: var(--mint);
+    }
+    .aside::before,
+    .aside::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: var(--peach);
+    }
+    .aside::before { width: 330px; height: 330px; right: -140px; top: -80px; }
+    .aside::after { width: 190px; height: 190px; left: -90px; bottom: -55px; background: var(--yellow); }
+    .brand {
+      position: absolute;
+      top: 38px;
+      left: 48px;
+      z-index: 2;
+      font-family: Georgia, serif;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .brand-mark {
+      display: inline-grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      margin-right: 8px;
+      border-radius: 50%;
+      color: white;
+      background: var(--green);
+    }
+    .hero-art {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-height: 76vh;
+      object-fit: contain;
+      filter: drop-shadow(0 24px 24px rgba(33,78,60,.12));
+    }
+    .main {
+      display: grid;
+      place-items: center;
+      padding: 48px clamp(24px, 6vw, 96px);
+    }
+    .card {
+      width: min(620px, 100%);
+      min-height: 560px;
+    }
+    .eyebrow {
+      color: #63766d;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    h1, h2 {
+      margin: 12px 0 18px;
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.05;
+    }
+    h1 { font-size: clamp(46px, 6vw, 74px); }
+    h2 { font-size: clamp(34px, 4vw, 52px); }
+    .intro { max-width: 520px; color: #607068; font-size: 18px; line-height: 1.6; }
+    .primary {
+      margin-top: 28px;
+      border: 0;
+      border-radius: 999px;
+      padding: 17px 26px;
+      color: white;
+      background: var(--green);
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .18s, box-shadow .18s;
+      box-shadow: 0 12px 28px rgba(33,78,60,.18);
+    }
+    .primary:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(33,78,60,.22); }
+    .primary:focus-visible, .option:focus-visible, .back:focus-visible {
+      outline: 3px solid var(--peach);
+      outline-offset: 3px;
+    }
+    .progress-wrap { display: flex; align-items: center; gap: 14px; margin-bottom: 30px; }
+    .progress-track { flex: 1; height: 7px; overflow: hidden; border-radius: 99px; background: var(--line); }
+    .progress-bar { height: 100%; width: 16.66%; border-radius: 99px; background: var(--green); transition: width .35s ease; }
+    .step { min-width: 42px; color: #718078; font-size: 13px; font-weight: 700; }
+    .options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .option {
+      min-height: 150px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 20px;
+      color: var(--ink);
+      background: rgba(255,255,255,.76);
+      cursor: pointer;
+      text-align: left;
+      transition: border-color .18s, transform .18s, background .18s;
+    }
+    .option:hover { transform: translateY(-3px); border-color: #91ad9d; background: white; }
+    .option-icon { display: block; margin-bottom: 16px; font-size: 38px; }
+    .option strong { display: block; margin-bottom: 5px; font-size: 18px; }
+    .option small { color: #718078; line-height: 1.35; }
+    .back {
+      margin-top: 24px;
+      border: 0;
+      padding: 8px 0;
+      color: #718078;
+      background: transparent;
+      cursor: pointer;
+    }
+    .result-layout { display: grid; grid-template-columns: 110px 1fr; gap: 24px; align-items: center; }
+    .result-badge {
+      display: grid;
+      place-items: center;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: var(--yellow);
+      font-size: 62px;
+    }
+    .recommendation { margin: 22px 0; border-left: 4px solid var(--peach); padding: 4px 0 4px 18px; color: #607068; line-height: 1.55; }
+    .shop-link { display: inline-block; text-decoration: none; }
+    .hidden { display: none; }
+    @media (max-width: 760px) {
+      .shell { grid-template-columns: 1fr; }
+      .aside { min-height: 220px; height: 34vh; padding: 24px; align-items: center; }
+      .brand { top: 20px; left: 24px; }
+      .hero-art { max-height: 250px; width: 75%; margin-left: auto; }
+      .main { min-height: 66vh; align-items: start; padding: 36px 20px 48px; }
+      .card { min-height: 0; }
+      h1 { font-size: 46px; }
+      h2 { font-size: 36px; }
+      .options { grid-template-columns: 1fr; }
+      .option { min-height: 96px; }
+      .result-layout { grid-template-columns: 82px 1fr; }
+      .result-badge { width: 82px; height: 82px; font-size: 46px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="aside" aria-label="Illustration boutique animaux">
+      <div class="brand"><span class="brand-mark">♥</span><span id="shopName">Ma Boutique</span></div>
+      <svg class="hero-art" viewBox="0 0 520 520" role="img" aria-label="Chien et chat avec leurs jouets">
+        <ellipse cx="260" cy="442" rx="180" ry="28" fill="#a9c1ad" opacity=".55"/>
+        <g transform="translate(230 105)">
+          <path d="M42 74 C42 20 172 15 202 78 C228 132 196 190 138 196 C72 202 34 151 42 74Z" fill="#f8efe1"/>
+          <path d="M57 70 C78 41 108 29 143 32 C101 48 80 88 78 118Z" fill="#c79a72"/>
+          <path d="M154 34 C187 42 208 68 210 98 C188 92 174 72 154 34Z" fill="#c79a72"/>
+          <ellipse cx="103" cy="105" rx="8" ry="10" fill="#21352e"/>
+          <ellipse cx="171" cy="105" rx="8" ry="10" fill="#21352e"/>
+          <path d="M119 131 Q137 118 155 131 Q137 149 119 131Z" fill="#8e5f48"/>
+          <path d="M137 145 C137 176 118 183 111 160 M137 145 C137 176 156 183 163 160" fill="none" stroke="#21352e" stroke-width="4" stroke-linecap="round"/>
+          <path d="M137 145 C137 160 137 171 137 171" fill="none" stroke="#21352e" stroke-width="4"/>
+        </g>
+        <g transform="translate(55 230)">
+          <path d="M30 86 C52 23 150 5 190 76 L213 210 L0 210Z" fill="#d78b62"/>
+          <path d="M31 86 C4 58 10 17 38 33 C54 42 55 69 31 86Z" fill="#b96f4e"/>
+          <path d="M178 82 C206 53 223 18 195 36 C181 46 180 67 178 82Z" fill="#b96f4e"/>
+          <ellipse cx="76" cy="111" rx="9" ry="11" fill="#21352e"/>
+          <ellipse cx="145" cy="111" rx="9" ry="11" fill="#21352e"/>
+          <path d="M99 134 Q112 124 126 134 Q112 148 99 134Z" fill="#21352e"/>
+          <path d="M112 143 C112 163 98 171 87 158 M112 143 C112 163 126 171 137 158" fill="none" stroke="#21352e" stroke-width="4" stroke-linecap="round"/>
+          <path d="M20 210 Q45 174 75 210 M137 210 Q167 174 190 210" fill="#eeb78f"/>
+          <path d="M43 91 Q112 75 183 91 L172 128 Q112 145 52 128Z" fill="#214e3c"/>
+          <circle cx="112" cy="119" r="14" fill="#f6dc89"/>
+        </g>
+        <g transform="translate(78 392)">
+          <circle cx="0" cy="0" r="29" fill="#f6dc89"/><circle cx="88" cy="15" r="32" fill="#f2bd9c"/>
+          <path d="M-21 9 Q0 38 24 10" fill="none" stroke="#21352e" stroke-width="5"/>
+        </g>
+      </svg>
+    </aside>
+
+    <main class="main">
+      <section class="card" id="welcome">
+        <div class="eyebrow">Quiz bien-être animal</div>
+        <h1>Quel bonheur<br>pour votre compagnon ?</h1>
+        <p class="intro">En quelques questions, découvrez une sélection adaptée à ses envies, sa taille et son rythme de vie.</p>
+        <button class="primary" id="start">Commencer le quiz&nbsp; →</button>
+      </section>
+
+      <section class="card hidden" id="quiz" aria-live="polite">
+        <div class="progress-wrap">
+          <div class="progress-track"><div class="progress-bar" id="progress"></div></div>
+          <div class="step" id="step">1 / 6</div>
+        </div>
+        <h2 id="question"></h2>
+        <div class="options" id="options"></div>
+        <button class="back hidden" id="back">← Retour</button>
+      </section>
+
+      <section class="card hidden" id="result" aria-live="polite">
+        <div class="eyebrow">Votre sélection est prête</div>
+        <div class="result-layout">
+          <div class="result-badge" id="resultIcon">♥</div>
+          <h2 id="resultTitle"></h2>
+        </div>
+        <p class="recommendation" id="recommendation"></p>
+        <a class="primary shop-link" id="shopLink" href="https://shopify.com" target="_blank" rel="noopener">Découvrir la boutique&nbsp; →</a>
+        <br>
+        <button class="back" id="restart">Recommencer le quiz</button>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const SHOPIFY_URL = "https://moustacheettruffeshop.myshopify.com";
+    const SHOP_NAME = "Moustache & Truffes";
+
+    const questions = [
+      { text: "Qui vous accompagne ?", options: [
+        { label: "Un chien", detail: "Câlins, balades et jeux", icon: "🐕", value: "chien" },
+        { label: "Un chat", detail: "Siestes et petites explorations", icon: "🐈", value: "chat" }
+      ]},
+      { text: "Quel est son style de vie ?", options: [
+        { label: "Actif", detail: "Toujours prêt à bouger", icon: "⚡", value: "actif" },
+        { label: "Détendu", detail: "Préférer la tranquillité", icon: "☁️", value: "calme" }
+      ]},
+      { text: "Quel âge a-t-il ?", options: [
+        { label: "Junior", detail: "Moins de 2 ans", icon: "🌱", value: "junior" },
+        { label: "Adulte", detail: "2 ans et plus", icon: "🌿", value: "adulte" }
+      ]},
+      { text: "Quel est son plaisir préféré ?", options: [
+        { label: "Manger", detail: "Une gourmande récompense", icon: "🥣", value: "gourmand" },
+        { label: "Jouer", detail: "Stimuler son esprit", icon: "🧶", value: "joueur" }
+      ]},
+      { text: "À quoi le temps ensemble ressemble-t-il ?", options: [
+        { label: "Dehors", detail: "Balades et aventures", icon: "🌳", value: "exterieur" },
+        { label: "À la maison", detail: "Câlins sur le canapé", icon: "🏡", value: "interieur" }
+      ]},
+      { text: "Quelle priorité avez-vous ?", options: [
+        { label: "Confort", detail: "Bien-être au quotidien", icon: "🛏️", value: "confort" },
+        { label: "Style", detail: "Un look unique", icon: "✨", value: "style" }
+      ]}
+    ];
+
+    let index = 0;
+    const answers = {};
+    const welcome = document.querySelector("#welcome");
+    const quiz = document.querySelector("#quiz");
+    const result = document.querySelector("#result");
+    const back = document.querySelector("#back");
+
+    document.querySelector("#shopName").textContent = SHOP_NAME;
+    document.querySelector("#shopLink").href = SHOPIFY_URL;
+
+    function show(element) {
+      [welcome, quiz, result].forEach(el => el.classList.add("hidden"));
+      element.classList.remove("hidden");
+    }
+
+    function renderQuestion() {
+      const item = questions[index];
+      document.querySelector("#step").textContent = `${index + 1} / ${questions.length}`;
+      document.querySelector("#progress").style.width = `${((index + 1) / questions.length) * 100}%`;
+      document.querySelector("#question").textContent = item.text;
+      document.querySelector("#options").replaceChildren();
+      back.classList.toggle("hidden", index === 0);
+
+      item.options.forEach(option => {
+        const button = document.createElement("button");
+        button.className = "option";
+        button.innerHTML = `<span class="option-icon">${option.icon}</span><strong>${option.label}</strong><small>${option.detail}</small>`;
+        button.addEventListener("click", () => {
+          answers[index] = option.value;
+          if (index < questions.length - 1) {
+            index++;
+            renderQuestion();
+          } else {
+            renderResult();
+          }
+        });
+        document.querySelector("#options").appendChild(button);
+      });
+    }
+
+    function renderResult() {
+      show(result);
+      const animal = answers[0];
+      const lifestyle = answers[1];
+      const priority = answers[5];
+      const resultIcon = document.querySelector("#resultIcon");
+      const resultTitle = document.querySelector("#resultTitle");
+      const recommendation = document.querySelector("#recommendation");
+
+      resultIcon.textContent = animal === "chien" ? "🐕" : "🐈";
+      if (priority === "confort") {
+        resultTitle.textContent = animal === "chien" ? "Le champion du confort" : "Le roi du cocooning";
+        recommendation.textContent = lifestyle === "actif"
+          ? "Après ses belles aventures, votre compagnon mérite des essentiels doux, pratiques et faciles à emporter."
+          : "Votre compagnon préfère les moments calmes : misez sur des matières douces, apaisantes et ultra-confortables.";
+      } else {
+        resultTitle.textContent = animal === "chien" ? "Le compagnon tendance" : "La star des intérieurs";
+        recommendation.textContent = "Un style pétillant, des accessoires pratiques et des petits détails qui mettent son quotidien — et le vôtre — en valeur.";
+      }
+    }
+
+    document.querySelector("#start").addEventListener("click", () => {
+      show(quiz);
+      renderQuestion();
+    });
+    back.addEventListener("click", () => {
+      if (index > 0) {
+        index--;
+        renderQuestion();
+      }
+    });
+    document.querySelector("#restart").addEventListener("click", () => {
+      index = 0;
+      Object.keys(answers).forEach(key => delete answers[key]);
+      show(welcome);
+    });
+  </script>
+</body>
+</html>
